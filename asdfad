@@ -1,0 +1,115 @@
+Mantap, kamu pengen “bedah” fingerprint apa aja yang mungkin dikirim ekstensi kayak **Augment Code** 👨‍💻.
+Aku jelasin cara **cek satu-satu** (pakai Windows ya, nanti bisa aku tambahin versi Linux kalau kamu pakai).
+
+---
+
+## 🔍 1. **Hardware fingerprint**
+
+Biasanya ambil data dari hardware ID.
+
+* **CPU ID**
+
+  ```powershell
+  Get-WmiObject Win32_Processor | Select-Object ProcessorId
+  ```
+* **Motherboard Serial Number**
+
+  ```powershell
+  Get-WmiObject Win32_BaseBoard | Select-Object SerialNumber
+  ```
+* **GPU Info**
+
+  ```powershell
+  Get-WmiObject Win32_VideoController | Select-Object Name, DriverVersion
+  ```
+* **Disk Serial Number**
+
+  ```powershell
+  Get-WmiObject Win32_PhysicalMedia | Select-Object SerialNumber
+  ```
+* **RAM Info**
+
+  ```powershell
+  systeminfo | findstr /C:"Total Physical Memory"
+  ```
+
+---
+
+## 🔍 2. **System info**
+
+* **Hostname (nama komputer)**
+
+  ```powershell
+  hostname
+  ```
+* **OS Version**
+
+  ```powershell
+  systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+  ```
+* **MAC Address**
+
+  ```powershell
+  getmac
+  ```
+* **Timezone**
+
+  ```powershell
+  tzutil /g
+  ```
+* **Bahasa Sistem**
+
+  ```powershell
+  Get-WinSystemLocale
+  ```
+
+---
+
+## 🔍 3. **Editor fingerprint (VS Code)**
+
+Ekstensi VS Code bisa “membaca dirinya sendiri”:
+
+* **Versi VS Code**
+  Menu → **Help → About**
+* **Daftar ekstensi**
+  Jalankan di terminal:
+
+  ```bash
+  code --list-extensions
+  ```
+* **Workspace path (folder project)**
+  Kalau ekstensi punya akses workspace, dia bisa tahu path project yang dibuka.
+
+---
+
+## 🔍 4. **Browser-like fingerprint**
+
+Kalau ekstensi buka login lewat browser/iframe, fingerprint seperti ini bisa ikut:
+
+* **IP Address**
+  Buka `https://whatismyipaddress.com`
+  Atau via cmd:
+
+  ```cmd
+  nslookup myip.opendns.com resolver1.opendns.com
+  ```
+* **Cookies / Session**
+  Lihat di DevTools Chrome (F12 → Application → Storage → Cookies).
+* **User Agent**
+  Jalankan di browser console (F12 → Console):
+
+  ```js
+  navigator.userAgent
+  ```
+
+---
+
+### 📝 Kesimpulan
+
+* Semua data di atas bisa dikumpulkan jadi **fingerprint unik**.
+* VM biasanya **masih bawa CPU ID / disk serial host**, jadi ketahuan itu mesin yang sama.
+* Augment (atau layanan sejenis) bisa kombinasikan semua info itu buat mencegah bikin akun trial berulang.
+
+---
+
+Mau aku bikinkan **script PowerShell sekali jalan** yang langsung nampilin semua fingerprint di atas dalam satu output biar gampang cek?
